@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Download Logs - Ransomware File Protector</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
+</head>
+<body class="bg-gray-900 min-h-screen flex items-center justify-center">
+  <div class="bg-gray-800 rounded-xl border border-gray-700 p-8 w-full max-w-lg">
+    <div class="flex items-center space-x-3 mb-6">
+      <div class="p-2 bg-blue-600 rounded-lg">
+        <i class="fas fa-download text-white"></i>
+      </div>
+      <h1 class="text-xl font-semibold text-gray-300">Download Log Files</h1>
+    </div>
+    
+    <form method="POST" action="/download_logs" class="space-y-6">
+      <div class="space-y-4">
+        <div class="flex items-center p-4 bg-gray-900 rounded-lg border border-gray-700 hover:border-blue-500 transition-colors">
+          <input class="form-checkbox h-5 w-5 text-blue-500 bg-gray-800 border-gray-700 rounded focus:ring-blue-500" 
+            type="checkbox" name="activity_log" id="activity_log" checked />
+          <label class="ml-4 flex-1" for="activity_log">
+            <div class="font-medium text-gray-300">Activity Log</div>
+            <div class="text-sm text-gray-400">All recorded monitoring events</div>
+          </label>
+          <i class="fas fa-clipboard-list text-gray-500"></i>
+        </div>
+        
+        <div class="flex items-center p-4 bg-gray-900 rounded-lg border border-gray-700 hover:border-blue-500 transition-colors">
+          <input class="form-checkbox h-5 w-5 text-blue-500 bg-gray-800 border-gray-700 rounded focus:ring-blue-500" 
+            type="checkbox" name="monitored_folders" id="monitored_folders" checked />
+          <label class="ml-4 flex-1" for="monitored_folders">
+            <div class="font-medium text-gray-300">Monitored Folders</div>
+            <div class="text-sm text-gray-400">List of all watched directories</div>
+          </label>
+          <i class="fas fa-folder-open text-gray-500"></i>
+        </div>
+        
+        <div class="flex items-center p-4 bg-gray-900 rounded-lg border border-gray-700 hover:border-blue-500 transition-colors">
+          <input class="form-checkbox h-5 w-5 text-blue-500 bg-gray-800 border-gray-700 rounded focus:ring-blue-500" 
+            type="checkbox" name="decryption_log" id="decryption_log" checked />
+          <label class="ml-4 flex-1" for="decryption_log">
+            <div class="font-medium text-gray-300">Decryption Log</div>
+            <div class="text-sm text-gray-400">Records of all decrypted files</div>
+          </label>
+          <i class="fas fa-key text-gray-500"></i>
+        </div>
+      </div>
+      
+      <div class="flex space-x-3">
+        <button type="submit" class="flex-1 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg flex items-center justify-center text-gray-300">
+          <i class="fas fa-file-zipper mr-2"></i>Download Selected Logs
+        </button>
+        <a href="/" class="flex-1 py-2 border border-gray-700 hover:bg-gray-700 rounded-lg flex items-center justify-center text-gray-300">
+          <i class="fas fa-arrow-left mr-2"></i>Back to Home
+        </a>
+      </div>
+    </form>
+  </div>
+</body>
+</html>

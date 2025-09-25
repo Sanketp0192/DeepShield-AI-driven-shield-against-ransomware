@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Assignment Submission Form</title>
+</head>
+<body>
+
+    <h2>Assignment Submission Form</h2>
+
+    <form action="G1form.php" method="POST" enctype="multipart/form-data">
+        <label for="name">Name:</label><br>
+        <input type="text" name="name" required><br><br>
+
+        <label for="usn">USN:</label><br>
+        <input type="number" name="usn" required><br><br>
+
+        <label for="sem">Semester:</label><br>
+        <select name="sem" required>
+            <option value="">Select</option>
+            <option value="1st">1st</option>
+            <option value="2nd">2nd</option>
+            <option value="3rd">3rd</option>
+            <option value="4th">4th</option>
+            <option value="5th">5th</option>
+            <option value="6th">6th</option>
+        </select><br><br>
+
+        <label for="assignment">Assignments:</label><br>
+        <input type="checkbox" name="assignment[]" value="Assignment 1"> Assignment 1<br>
+        <input type="checkbox" name="assignment[]" value="Assignment 2"> Assignment 2<br>
+        <input type="checkbox" name="assignment[]" value="Assignment 3"> Assignment 3<br><br>
+
+        <label for="subject">Subject:</label><br>
+        <input type="text" name="subject" required><br><br>
+
+        <label for="message">Message:</label><br>
+        <textarea name="message" rows="4" cols="50"></textarea><br><br>
+
+        <label for="uploadfile">Upload File:</label><br>
+        <input type="file" name="uploadfile" required><br><br>
+
+        <!-- Radio Button for Submission Type -->
+        <label>Submission Type:</label><br>
+        <input type="radio" name="submission_type" value="Online" required> Online<br>
+        <input type="radio" name="submission_type" value="Physical" required> Physical<br><br>
+
+        <input type="submit" value="Submit">
+    </form>
+
+</body>
+</html>

@@ -1,0 +1,13 @@
+@'
+venv/
+__pycache__/
+*.pyc
+.env
+instance/
+*.sqlite3
+backups/
+.DS_Store
+.vscode/
+'@ | Set-Content -Path .\.gitignore
+
+"# DeepShield`nAI-driven ransomware detection & recovery" | Set-Content -Path .\README.md

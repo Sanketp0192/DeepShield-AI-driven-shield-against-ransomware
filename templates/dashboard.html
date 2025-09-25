@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dashboard - Ransomware File Protector</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
+  <style>
+    .chart-container {
+      position: relative;
+      height: 350px;
+    }
+    .table-container {
+      max-height: 400px;
+      overflow-y: auto;
+    }
+    .table-container::-webkit-scrollbar {
+      width: 6px;
+    }
+    .table-container::-webkit-scrollbar-thumb {
+      background-color: #3b82f6;
+      border-radius: 3px;
+    }
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 1.5rem;
+    }
+    .header-section {
+      grid-column: span 12;
+    }
+    .filters-section {
+      grid-column: span 12;
+    }
+    .stats-section {
+      grid-column: span 12;
+    }
+    .chart-section {
+      grid-column: span 6;
+    }
+    .suspicious-section {
+      grid-column: span 6;
+    }
+    .threat-summary-section {
+      grid-column: span 6;
+    }
+    .decrypted-section {
+      grid-column: span 6;
+    }
+    @media (max-width: 1024px) {
+      .chart-section, .suspicious-section,
+      .threat-summary-section, .decrypted-section {
+        grid-column: span 12;
+      }
+    }
+  </style>
+</head>
+<body class="bg-gray-900 text-gray-100 min-h-screen">
+  <div class="container mx-auto px-4 py-8 max-w-7xl dashboard-grid">
+    <!-- Header Section -->
+    <header class="header-section flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+      <div class="flex items-center space-x-4">
+        <div class="p-3 bg-blue-600 rounded-lg">
+          <i class="fas fa-chart-pie text-white text-2xl"></i>
+        </div>
+        <div>
+          <h1 class="text-2xl font-bold">Ransomware Protection Dashboard</h1>
+          <p class="text-gray-400 text-sm">Analytics and threat detection overview</p>
+        </div>
+      </div>
+      <a href="/" class="px-4 py-2 border border-blue-500 text-blue-400 rounded-lg hover:bg-blue-900 flex items-center">
+        <i class="fas fa-arrow-left mr-2"></i>Back to Monitoring
+      </a>
+    </header>
+
+    <!-- Filters Section -->
+    <div class="filters-section bg-gray-800 rounded-xl border border-gray-700 p-6 mb-6">
+      <h2 class="text-xl font-semibold mb-4 flex items-center">
+        <i class="fas fa-filter text-blue-400 mr-3"></i>Filters
+      </h2>
+      <form method="GET" action="/dashboard" class="grid grid-cols-1 md:grid-cols-5 gap-4">
+        <div class="md:col-span-2">
+          <label for="folder" class="block text-gray-400 mb-2">Folder:</label>
+          <select name="folder" id="folder" class="w-full px-4 py-2 border border-gray-700 rounded-lg bg-gray-900 text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <option value="">All Folders</option>
+            {% for folder in folders %}
+              <option value="{{ folder }}" {% if folder == selected_folder %}selected{% endif %}>{{ folder }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="md:col-span-3 flex items-end space-x-3">
+          <button type="submit" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg flex items-center">
+            <i class="fas fa-search mr-2"></i>Apply Filters
+          </button>
+          <a href="/dashboard" class="px-4 py-2 border border-gray-700 hover:bg-gray-700 rounded-lg flex items-center">
+            <i class="fas fa-sync-alt mr-2"></i>Reset
+          </a>
+        </div>
+      </form>
+    </div>
+
+    <!-- Stats Cards Section -->
+    <div class="stats-section grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+      <div class="bg-gray-800 rounded-xl border-l-4 border-blue-500 p-6">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-gray-400 text-sm uppercase">Monitored Folders</p>
+            <h3 class="text-2xl font-bold">{{ folders|length }}</h3>
+          </div>
+          <i class="fas fa-folder-open text-blue-400 text-2xl"></i>
+        </div>
+      </div>
+      
+      <div class="bg-gray-800 rounded-xl border-l-4 border-red-500 p-6">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-gray-400 text-sm uppercase">Suspicious Files</p>
+            <h3 class="text-2xl font-bold text-red-400">{{ chart_data.suspicious[0] }}</h3>
+          </div>
+          <i class="fas fa-exclamation-triangle text-red-400 text-2xl"></i>
+        </div>
+      </div>
+      
+      <div class="bg-gray-800 rounded-xl border-l-4 border-green-500 p-6">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-gray-400 text-sm uppercase">Safe Files</p>
+            <h3 class="text-2xl font-bold text-green-400">{{ chart_data.safe[0] }}</h3>
+          </div>
+          <i class="fas fa-shield-alt text-green-400 text-2xl"></i>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    {% if chart_data.labels %}
+    <!-- First Row: Chart and Suspicious Files -->
+    <div class="chart-section bg-gray-800 rounded-xl border border-gray-700 p-6">
+      <h2 class="text-xl font-semibold mb-4 flex items-center">
+        <i class="fas fa-chart-bar text-blue-400 mr-3"></i>File Activity Analysis
+      </h2>
+      <div class="chart-container">
+        <canvas id="activityChart"></canvas>
+      </div>
+    </div>
+
+    <div class="suspicious-section bg-gray-800 rounded-xl border border-gray-700 p-6">
+      <h2 class="text-xl font-semibold mb-4 flex items-center text-red-400">
+        <i class="fas fa-exclamation-triangle mr-3"></i>Suspicious Files Detected
+      </h2>
+      <div class="table-container">
+        <table class="min-w-full border border-gray-700">
+          <thead class="bg-gray-900">
+            <tr>
+              <th class="px-4 py-3 border border-gray-700 text-left">File</th>
+              <th class="px-4 py-3 border border-gray-700 text-left">Folder</th>
+              <th class="px-4 py-3 border border-gray-700 text-left">Detected At</th>
+              <th class="px-4 py-3 border border-gray-700 text-left">AI Mode</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for event in monitor_manager.get_event_data() %}
+              {% if event.suspicious %}
+              <tr class="border-t border-gray-700 hover:bg-gray-900">
+                <td class="px-4 py-3 border border-gray-700">{{ event.file }}</td>
+                <td class="px-4 py-3 border border-gray-700">{{ event.folder }}</td>
+                <td class="px-4 py-3 border border-gray-700">{{ event.timestamp }}</td>
+                <td class="px-4 py-3 border border-gray-700">
+                  <span class="px-2 py-1 rounded-full text-xs bg-{{ 'blue-900' if event.ai_mode else 'gray-700' }} text-{{ 'blue-400' if event.ai_mode else 'gray-400' }}">
+                    {{ 'ON' if event.ai_mode else 'OFF' }}
+                  </span>
+                </td>
+              </tr>
+              {% endif %}
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Second Row: Threat Summary and Decrypted Files -->
+    <div class="threat-summary-section bg-gray-800 rounded-xl border border-gray-700 p-6">
+      <h2 class="text-xl font-semibold mb-4 flex items-center">
+        <i class="fas fa-bullseye text-blue-400 mr-3"></i>Threat Summary
+      </h2>
+      
+      {% if most_targeted_folder %}
+      <div class="bg-gray-900 rounded-lg border border-gray-700 p-4 mb-4">
+        <div class="flex items-center space-x-3">
+          <i class="fas fa-bullseye text-red-400 text-xl"></i>
+          <div>
+            <h3 class="text-lg font-semibold text-red-400">Most Targeted Folder</h3>
+            <p class="text-gray-300">
+              <span class="font-medium">{{ most_targeted_folder[0] }}</span> with 
+              <span class="font-medium">{{ most_targeted_folder[1] }}</span> suspicious files
+            </p>
+          </div>
+        </div>
+      </div>
+      {% endif %}
+      
+      <div class="bg-gray-900 rounded-lg border border-gray-700 p-4">
+        <div class="flex items-center space-x-3">
+          <i class="fas fa-clock text-blue-400 text-xl"></i>
+          <div>
+            <h3 class="text-lg font-semibold">Last Scan</h3>
+            <p class="text-gray-300">{{ last_scan_time }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="decrypted-section bg-gray-800 rounded-xl border border-gray-700 p-6">
+      <h2 class="text-xl font-semibold mb-4 flex items-center text-green-400">
+        <i class="fas fa-unlock mr-3"></i>Recently Decrypted Files
+      </h2>
+      <div class="table-container">
+        <table class="min-w-full border border-gray-700">
+          <thead class="bg-gray-900">
+            <tr>
+              <th class="px-4 py-3 border border-gray-700 text-left">Filename</th>
+              <th class="px-4 py-3 border border-gray-700 text-left">Folder</th>
+              <th class="px-4 py-3 border border-gray-700 text-left">Decrypted At</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for file in recent_decrypted_files %}
+            <tr class="border-t border-gray-700 hover:bg-gray-900">
+              <td class="px-4 py-3 border border-gray-700">{{ file.filename }}</td>
+              <td class="px-4 py-3 border border-gray-700">{{ file.folder }}</td>
+              <td class="px-4 py-3 border border-gray-700">{{ file.timestamp }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    {% else %}
+    <div class="header-section bg-gray-800 rounded-xl border border-gray-700 p-8 text-center">
+      <i class="fas fa-info-circle text-gray-500 text-4xl mb-4"></i>
+      <h3 class="text-xl font-semibold text-gray-400">No data available for selected filters</h3>
+      <p class="text-gray-500 mt-2">Try adjusting your filters or monitor some folders first</p>
+    </div>
+    {% endif %}
+
+    <!-- Back Button -->
+    <div class="header-section mt-8 text-center">
+      <a href="/" class="inline-flex items-center px-4 py-2 border border-blue-500 text-blue-400 rounded-lg hover:bg-blue-900">
+        <i class="fas fa-arrow-left mr-2"></i>Back to Monitoring
+      </a>
+    </div>
+  </div>
+
+  <!-- Chart Script -->
+  {% if chart_data.labels %}
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const ctx = document.getElementById('activityChart').getContext('2d');
+      const activityChart = new Chart(ctx, {
+        type: 'pie',
+        data: {
+          labels: ['Suspicious Files', 'Safe Files'],
+          datasets: [{
+            data: [
+              {{ chart_data.suspicious[0] }},
+              {{ chart_data.safe[0] }}
+            ],
+            backgroundColor: ['#ef4444', '#10b981'],
+            borderWidth: 0
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'bottom',
+              labels: {
+                color: '#ffffff',
+                font: {
+                  size: 14
+                }
+              }
+            },
+            tooltip: {
+              backgroundColor: '#1f2937',
+              titleColor: '#ffffff',
+              bodyColor: '#ffffff',
+              borderColor: '#374151',
+              borderWidth: 1,
+              callbacks: {
+                label: function(context) {
+                  const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                  const value = context.raw;
+                  const percentage = Math.round((value / total) * 100);
+                  return ` ${context.label}: ${value} (${percentage}%)`;
+                }
+              }
+            }
+          }
+        }
+      });
+    });
+  </script>
+  {% endif %}
+</body>
+</html>
