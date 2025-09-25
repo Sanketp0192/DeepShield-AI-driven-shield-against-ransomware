@@ -16,15 +16,15 @@ The DeepShield – AI-driven shield against ransomware is a web-based cybersecur
 
 ## Screenshots
 ### Login Page
-![Login Page](DeepShield_ScreenShots/1_Login_Page.png)
+![Login Page](DeepShield_ScreenShot/1_Login_Page.png)
 
 ### Main page
-![Main page](DeepShield_ScreenShots/2_Main_page.png)
+![Main page](DeepShield_ScreenShot/2_Main_page.png)
 
 ### Dashboard
-![Dashboard](DeepShield_ScreenShots/3_Dashboard_Page.png)
+![Dashboard](DeepShield_ScreenShot/3_Dashboard_Page.png)
 
-![Dashboard](DeepShield_ScreenShots/4_Dashboard_Page.png)
+![Dashboard](DeepShield_ScreenShot/4_Dashboard_Page.png)
 
 ## Future scope
 - In the future, this system can be enhanced to automatically block suspicious processes or 
